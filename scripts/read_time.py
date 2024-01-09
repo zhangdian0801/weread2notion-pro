@@ -3,6 +3,8 @@ from datetime import datetime
 from datetime import timedelta
 import os
 
+import pendulum
+
 from notion_helper import NotionHelper
 from weread_api import WeReadApi
 from utils import format_date, get_date, get_icon, get_number, get_relation, get_title
@@ -41,6 +43,7 @@ if __name__ == "__main__":
     weread_cookie = os.getenv("WEREAD_COOKIE")
     notion_helper = NotionHelper()
     weread_api = WeReadApi()
+
     if(os.path.isfile("./OUT_FOLDER/weread.svg")):
         image_url = notion_helper.image_dict.get("url")
         block_id = notion_helper.image_dict.get("id")
@@ -50,6 +53,10 @@ if __name__ == "__main__":
         if(image_url and block_id):
             notion_helper.update_image_block_link(block_id,new_image_url)
     api_data = weread_api.get_api_data()
+    now = pendulum.now('Asia/Shanghai').start_of('day')
+    today_timestamp = now.int_timestamp
+    if(today_timestamp not in api_data):
+        api_data[today_timestamp] = 0
     readTimes = dict(sorted(api_data["readTimes"].items()))
     results =  notion_helper.query_all(database_id=notion_helper.day_database_id)
     for result in results:
