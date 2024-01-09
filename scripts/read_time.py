@@ -10,6 +10,7 @@ from weread_api import WeReadApi
 from utils import format_date, get_date, get_icon, get_number, get_relation, get_title
 
 def insert_to_notion(page_id,timestamp,duration):
+    print(f"{page_id} {timestamp} {duration}")
     parent = {"database_id": notion_helper.day_database_id, "type": "database_id"}
     properties = {
         "标题": get_title(format_date(datetime.utcfromtimestamp(timestamp)+timedelta(hours=8),"%Y年%m月%d日")),
@@ -43,7 +44,6 @@ if __name__ == "__main__":
     weread_cookie = os.getenv("WEREAD_COOKIE")
     notion_helper = NotionHelper()
     weread_api = WeReadApi()
-
     if(os.path.isfile("./OUT_FOLDER/weread.svg")):
         image_url = notion_helper.image_dict.get("url")
         block_id = notion_helper.image_dict.get("id")
@@ -56,6 +56,7 @@ if __name__ == "__main__":
     now = pendulum.now('Asia/Shanghai').start_of('day')
     today_timestamp = now.int_timestamp
     if(today_timestamp not in api_data):
+        print(str(today_timestamp))
         api_data[today_timestamp] = 0
     readTimes = dict(sorted(api_data["readTimes"].items()))
     results =  notion_helper.query_all(database_id=notion_helper.day_database_id)
